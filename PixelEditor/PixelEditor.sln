@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelEditor", "PixelEditor.csproj", "{31CBE086-7B3D-0D81-7794-D15BD779A1BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31CBE086-7B3D-0D81-7794-D15BD779A1BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31CBE086-7B3D-0D81-7794-D15BD779A1BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31CBE086-7B3D-0D81-7794-D15BD779A1BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31CBE086-7B3D-0D81-7794-D15BD779A1BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F89A6791-7D40-4CCA-A976-813C3E3D3D81}
+	EndGlobalSection
+EndGlobal
