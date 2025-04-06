@@ -25,6 +25,10 @@
             this.btnEraser = new System.Windows.Forms.ToolStripButton();
             this.btnBezier = new System.Windows.Forms.ToolStripButton();
             this.btnPolyline = new System.Windows.Forms.ToolStripButton();
+            this.btnText = new System.Windows.Forms.ToolStripButton();
+            this.btnFont = new System.Windows.Forms.ToolStripButton();
+            this.btnTextColor = new System.Windows.Forms.ToolStripButton();
+            this.btnBgColor = new System.Windows.Forms.ToolStripButton();
             this.btnColor = new System.Windows.Forms.ToolStripButton();
             this.btnClear = new System.Windows.Forms.ToolStripButton();
             this.trackBarSize = new System.Windows.Forms.TrackBar();
@@ -32,6 +36,7 @@
             this.panelSegmentType = new System.Windows.Forms.Panel();
             this.radioCurve = new System.Windows.Forms.RadioButton();
             this.radioStraight = new System.Windows.Forms.RadioButton();
+            this.textEntryBox = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSize)).BeginInit();
             this.panelSegmentType.SuspendLayout();
@@ -47,6 +52,10 @@
             this.btnEraser,
             this.btnBezier,
             this.btnPolyline,
+            this.btnText,
+            this.btnFont,
+            this.btnTextColor,
+            this.btnBgColor,
             this.btnColor,
             this.btnClear});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
@@ -103,6 +112,34 @@
             this.btnPolyline.Name = "btnPolyline";
             this.btnPolyline.Size = new System.Drawing.Size(50, 22);
             this.btnPolyline.Text = "Polyline";
+            // 
+            // btnText
+            // 
+            this.btnText.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnText.Name = "btnText";
+            this.btnText.Size = new System.Drawing.Size(31, 22);
+            this.btnText.Text = "Text";
+            // 
+            // btnFont
+            // 
+            this.btnFont.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnFont.Name = "btnFont";
+            this.btnFont.Size = new System.Drawing.Size(35, 22);
+            this.btnFont.Text = "Font";
+            // 
+            // btnTextColor
+            // 
+            this.btnTextColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnTextColor.Name = "btnTextColor";
+            this.btnTextColor.Size = new System.Drawing.Size(64, 22);
+            this.btnTextColor.Text = "Text Color";
+            // 
+            // btnBgColor
+            // 
+            this.btnBgColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnBgColor.Name = "btnBgColor";
+            this.btnBgColor.Size = new System.Drawing.Size(56, 22);
+            this.btnBgColor.Text = "Bg Color";
             // 
             // btnColor
             // 
@@ -170,11 +207,23 @@
             this.radioStraight.Text = "Straight";
             this.radioStraight.UseVisualStyleBackColor = true;
             // 
+            // textEntryBox
+            // 
+            this.textEntryBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textEntryBox.Multiline = true;
+            this.textEntryBox.Visible = false;
+            this.textEntryBox.Location = new System.Drawing.Point(0, 0);
+            this.textEntryBox.Name = "textEntryBox";
+            this.textEntryBox.Size = new System.Drawing.Size(100, 20);
+            this.textEntryBox.TabIndex = 4;
+            this.textEntryBox.Leave += new System.EventHandler(this.TextEntryBox_Leave);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.textEntryBox);
             this.Controls.Add(this.panelSegmentType);
             this.Controls.Add(this.lblSize);
             this.Controls.Add(this.trackBarSize);
@@ -205,6 +254,10 @@
         private System.Windows.Forms.ToolStripButton btnEraser;
         private System.Windows.Forms.ToolStripButton btnBezier;
         private System.Windows.Forms.ToolStripButton btnPolyline;
+        private System.Windows.Forms.ToolStripButton btnText;
+        private System.Windows.Forms.ToolStripButton btnFont;
+        private System.Windows.Forms.ToolStripButton btnTextColor;
+        private System.Windows.Forms.ToolStripButton btnBgColor;
         private System.Windows.Forms.ToolStripButton btnColor;
         private System.Windows.Forms.ToolStripButton btnClear;
         private System.Windows.Forms.TrackBar trackBarSize;
@@ -212,5 +265,6 @@
         private System.Windows.Forms.Panel panelSegmentType;
         private System.Windows.Forms.RadioButton radioCurve;
         private System.Windows.Forms.RadioButton radioStraight;
+        private System.Windows.Forms.TextBox textEntryBox;
     }
 }
