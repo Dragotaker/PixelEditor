@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj": {}
+    "c:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj": {
+    "c:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj",
+        "projectUniqueName": "c:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj",
         "projectName": "PixelEditor",
-        "projectPath": "c:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj",
+        "projectPath": "c:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj",
         "packagesPath": "C:\\Users\\Ренат\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\obj\\",
+        "outputPath": "c:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ренат\\AppData\\Roaming\\NuGet\\NuGet.Config"

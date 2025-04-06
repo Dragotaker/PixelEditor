@@ -19,6 +19,10 @@ namespace PixelEditor
         private Point previousPoint;
         
         private List<Point> bezierPoints = new List<Point>();
+        private List<Point> polylinePoints = new List<Point>();
+        private bool isBezierSegment = false;
+        private bool isBuildingPolyline = false;
+        private int clicksCount = 0;
 
         public Form1()
         {
@@ -32,9 +36,12 @@ namespace PixelEditor
             btnPencil.Click += BtnPencil_Click;
             btnEraser.Click += BtnEraser_Click;
             btnBezier.Click += BtnBezier_Click;
+            btnPolyline.Click += BtnPolyline_Click;
             btnColor.Click += BtnColor_Click;
             btnClear.Click += BtnClear_Click;
             trackBarSize.Scroll += TrackBarSize_Scroll;
+            radioStraight.CheckedChanged += RadioSegmentType_Changed;
+            radioCurve.CheckedChanged += RadioSegmentType_Changed;
         }
 
         private void InitializeCanvas()
@@ -79,36 +86,58 @@ namespace PixelEditor
                 }
             }
             
-            // Для кривой Безье
-            if (mode == "Bezier")
+            // Для полилинии
+            if (mode == "Polyline" && isBuildingPolyline && polylinePoints.Count > 0)
             {
-                // Рисуем точки
+                // Рисуем уже поставленные точки
+                foreach (var point in polylinePoints)
+                {
+                    e.Graphics.FillEllipse(Brushes.Red, point.X - 3, point.Y - 3, 6, 6);
+                }
+
+                // Предпросмотр текущего сегмента
+                Point cursorPos = this.PointToClient(Cursor.Position);
+                
+                if (!isBezierSegment)
+                {
+                    // Предпросмотр отрезка ломаной
+                    if (polylinePoints.Count >= 1)
+                    {
+                        e.Graphics.DrawLine(Pens.Gray, polylinePoints[polylinePoints.Count - 1], cursorPos);
+                    }
+                }
+                else
+                {
+                    // Предпросмотр дуги (квадратичной кривой)
+                    if (polylinePoints.Count == 1)
+                    {
+                        e.Graphics.DrawLine(Pens.LightGray, polylinePoints[0], cursorPos);
+                    }
+                    else if (polylinePoints.Count == 2)
+                    {
+                        e.Graphics.DrawCurve(Pens.LightGray, new[] { polylinePoints[0], polylinePoints[1], cursorPos });
+                    }
+                }
+            }
+            
+            // Предпросмотр для кривой Безье (дуги)
+            if (mode == "Bezier" && bezierPoints.Count > 0)
+            {
+                Point cursorPos = this.PointToClient(Cursor.Position);
+                
+                // Рисуем уже поставленные точки
                 foreach (var point in bezierPoints)
                 {
                     e.Graphics.FillEllipse(Brushes.Red, point.X - 3, point.Y - 3, 6, 6);
                 }
                 
-                // Рисуем вспомогательные линии
-                if (bezierPoints.Count > 1)
+                if (bezierPoints.Count == 1)
                 {
-                    for (int i = 0; i < bezierPoints.Count - 1; i++)
-                    {
-                        e.Graphics.DrawLine(Pens.LightGray, bezierPoints[i], bezierPoints[i + 1]);
-                    }
+                    e.Graphics.DrawLine(Pens.LightGray, bezierPoints[0], cursorPos);
                 }
-                
-                // Рисуем кривую когда есть 4 точки
-                if (bezierPoints.Count == 4)
+                else if (bezierPoints.Count == 2)
                 {
-                    using (Pen pen = new Pen(Color.Red, 1))
-                    {
-                        pen.DashStyle = DashStyle.Dash;
-                        e.Graphics.DrawBezier(pen, 
-                            bezierPoints[0], 
-                            bezierPoints[1], 
-                            bezierPoints[2], 
-                            bezierPoints[3]);
-                    }
+                    e.Graphics.DrawCurve(Pens.LightGray, new[] { bezierPoints[0], bezierPoints[1], cursorPos });
                 }
             }
         }
@@ -119,20 +148,17 @@ namespace PixelEditor
             
             if (mode == "Bezier")
             {
-                if (bezierPoints.Count < 4)
+                if (bezierPoints.Count < 3)
                 {
                     bezierPoints.Add(e.Location);
                     
-                    if (bezierPoints.Count == 4)
+                    if (bezierPoints.Count == 3)
                     {
                         using (Graphics g = Graphics.FromImage(canvas))
                         {
                             g.SmoothingMode = SmoothingMode.AntiAlias;
-                            g.DrawBezier(new Pen(drawColor, penSize), 
-                                bezierPoints[0], 
-                                bezierPoints[1], 
-                                bezierPoints[2], 
-                                bezierPoints[3]);
+                            // Используем квадратичную кривую (3 точки)
+                            g.DrawCurve(new Pen(drawColor, penSize), bezierPoints.ToArray());
                         }
                         bezierPoints.Clear();
                         Invalidate();
@@ -141,12 +167,60 @@ namespace PixelEditor
                 return;
             }
             
+            // Режим полилинии
+            if (mode == "Polyline")
+            {
+                if (!isBuildingPolyline)
+                {
+                    isBuildingPolyline = true;
+                    polylinePoints.Clear();
+                    clicksCount = 0;
+                }
+
+                clicksCount++;
+                polylinePoints.Add(e.Location);
+
+                // Для ломаной (2 клика)
+                if (!isBezierSegment && clicksCount == 2)
+                {
+                    using (Graphics g = Graphics.FromImage(canvas))
+                    {
+                        g.SmoothingMode = SmoothingMode.AntiAlias;
+                        g.DrawLine(new Pen(drawColor, penSize), 
+                            polylinePoints[0], 
+                            polylinePoints[1]);
+                    }
+                    
+                    // Начинаем новый сегмент с последней точки
+                    polylinePoints.Clear();
+                    polylinePoints.Add(e.Location);
+                    clicksCount = 1;
+                }
+                // Для дуги (3 клика)
+                else if (isBezierSegment && clicksCount == 3)
+                {
+                    using (Graphics g = Graphics.FromImage(canvas))
+                    {
+                        g.SmoothingMode = SmoothingMode.AntiAlias;
+                        // Используем квадратичную кривую (3 точки)
+                        g.DrawCurve(new Pen(drawColor, penSize), polylinePoints.ToArray());
+                    }
+                    
+                    // Начинаем новый сегмент с последней точки
+                    polylinePoints.Clear();
+                    polylinePoints.Add(e.Location);
+                    clicksCount = 1;
+                }
+
+                Invalidate();
+                return;
+            }
+            
             // Для других инструментов
             drawing = true;
             startPoint = e.Location;
             previousPoint = e.Location;
             
-            // Для карандаша и ластика сразу рисуем первую точку
             if (mode == "Pencil" || mode == "Eraser")
             {
                 using (Graphics g = Graphics.FromImage(canvas))
@@ -197,18 +271,30 @@ namespace PixelEditor
                 return;
             }
             
-            // Для Line, Rectangle, Circle - только предпросмотр
             if (drawing && e.Button == MouseButtons.Left)
+                Invalidate();
+            
+            if ((mode == "Polyline" && isBuildingPolyline) || (mode == "Bezier" && bezierPoints.Count > 0))
                 Invalidate();
         }
 
         private void MouseUpHandler(object sender, MouseEventArgs e)
         {
-            if (!drawing || mode == null || e.Button != MouseButtons.Left) return;
+            if (!drawing && mode != "Polyline" && mode != "Bezier") return;
             
             if (mode == "Pencil" || mode == "Eraser")
             {
                 drawing = false;
+                return;
+            }
+            
+            if (mode == "Polyline" && e.Button == MouseButtons.Right)
+            {
+                // Завершение полилинии
+                isBuildingPolyline = false;
+                polylinePoints.Clear();
+                clicksCount = 0;
+                Invalidate();
                 return;
             }
             
@@ -251,11 +337,18 @@ namespace PixelEditor
             currentActiveButton = activeButton;
             currentActiveButton.BackColor = Color.LightBlue;
             
-            // Сброс состояния Безье при смене инструмента
-            if (mode != "Bezier")
+            if (mode != "Polyline" && mode != "Bezier")
+            {
                 bezierPoints.Clear();
+                polylinePoints.Clear();
+                isBuildingPolyline = false;
+                clicksCount = 0;
+            }
+            
+            panelSegmentType.Visible = (mode == "Polyline");
         }
 
+        // Остальные методы обработчиков событий остаются без изменений
         private void BtnLine_Click(object sender, EventArgs e)
         {
             mode = "Line";
@@ -292,6 +385,20 @@ namespace PixelEditor
             SetActiveButton((ToolStripButton)sender);
         }
 
+        private void BtnPolyline_Click(object sender, EventArgs e)
+        {
+            mode = "Polyline";
+            SetActiveButton((ToolStripButton)sender);
+        }
+
+        private void RadioSegmentType_Changed(object sender, EventArgs e)
+        {
+            if (radioStraight.Checked)
+                isBezierSegment = false;
+            else if (radioCurve.Checked)
+                isBezierSegment = true;
+        }
+
         private void BtnColor_Click(object sender, EventArgs e)
         {
             ColorDialog colorDialog = new ColorDialog();
@@ -305,6 +412,9 @@ namespace PixelEditor
         {
             graphics.Clear(Color.White);
             bezierPoints.Clear();
+            polylinePoints.Clear();
+            isBuildingPolyline = false;
+            clicksCount = 0;
             Invalidate();
         }
 

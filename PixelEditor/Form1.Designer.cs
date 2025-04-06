@@ -24,12 +24,17 @@
             this.btnPencil = new System.Windows.Forms.ToolStripButton();
             this.btnEraser = new System.Windows.Forms.ToolStripButton();
             this.btnBezier = new System.Windows.Forms.ToolStripButton();
+            this.btnPolyline = new System.Windows.Forms.ToolStripButton();
             this.btnColor = new System.Windows.Forms.ToolStripButton();
             this.btnClear = new System.Windows.Forms.ToolStripButton();
             this.trackBarSize = new System.Windows.Forms.TrackBar();
             this.lblSize = new System.Windows.Forms.Label();
+            this.panelSegmentType = new System.Windows.Forms.Panel();
+            this.radioCurve = new System.Windows.Forms.RadioButton();
+            this.radioStraight = new System.Windows.Forms.RadioButton();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSize)).BeginInit();
+            this.panelSegmentType.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -41,6 +46,7 @@
             this.btnPencil,
             this.btnEraser,
             this.btnBezier,
+            this.btnPolyline,
             this.btnColor,
             this.btnClear});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
@@ -91,6 +97,13 @@
             this.btnBezier.Size = new System.Drawing.Size(41, 22);
             this.btnBezier.Text = "Bezier";
             // 
+            // btnPolyline
+            // 
+            this.btnPolyline.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPolyline.Name = "btnPolyline";
+            this.btnPolyline.Size = new System.Drawing.Size(50, 22);
+            this.btnPolyline.Text = "Polyline";
+            // 
             // btnColor
             // 
             this.btnColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -124,11 +137,45 @@
             this.lblSize.TabIndex = 2;
             this.lblSize.Text = "Size: 3";
             // 
+            // panelSegmentType
+            // 
+            this.panelSegmentType.Controls.Add(this.radioCurve);
+            this.panelSegmentType.Controls.Add(this.radioStraight);
+            this.panelSegmentType.Location = new System.Drawing.Point(120, 28);
+            this.panelSegmentType.Name = "panelSegmentType";
+            this.panelSegmentType.Size = new System.Drawing.Size(200, 30);
+            this.panelSegmentType.TabIndex = 3;
+            this.panelSegmentType.Visible = false;
+            // 
+            // radioCurve
+            // 
+            this.radioCurve.AutoSize = true;
+            this.radioCurve.Location = new System.Drawing.Point(100, 7);
+            this.radioCurve.Name = "radioCurve";
+            this.radioCurve.Size = new System.Drawing.Size(52, 17);
+            this.radioCurve.TabIndex = 1;
+            this.radioCurve.TabStop = true;
+            this.radioCurve.Text = "Curve";
+            this.radioCurve.UseVisualStyleBackColor = true;
+            // 
+            // radioStraight
+            // 
+            this.radioStraight.AutoSize = true;
+            this.radioStraight.Checked = true;
+            this.radioStraight.Location = new System.Drawing.Point(3, 7);
+            this.radioStraight.Name = "radioStraight";
+            this.radioStraight.Size = new System.Drawing.Size(61, 17);
+            this.radioStraight.TabIndex = 0;
+            this.radioStraight.TabStop = true;
+            this.radioStraight.Text = "Straight";
+            this.radioStraight.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.panelSegmentType);
             this.Controls.Add(this.lblSize);
             this.Controls.Add(this.trackBarSize);
             this.Controls.Add(this.toolStrip1);
@@ -142,6 +189,8 @@
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSize)).EndInit();
+            this.panelSegmentType.ResumeLayout(false);
+            this.panelSegmentType.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -155,9 +204,13 @@
         private System.Windows.Forms.ToolStripButton btnPencil;
         private System.Windows.Forms.ToolStripButton btnEraser;
         private System.Windows.Forms.ToolStripButton btnBezier;
+        private System.Windows.Forms.ToolStripButton btnPolyline;
         private System.Windows.Forms.ToolStripButton btnColor;
         private System.Windows.Forms.ToolStripButton btnClear;
         private System.Windows.Forms.TrackBar trackBarSize;
         private System.Windows.Forms.Label lblSize;
+        private System.Windows.Forms.Panel panelSegmentType;
+        private System.Windows.Forms.RadioButton radioCurve;
+        private System.Windows.Forms.RadioButton radioStraight;
     }
 }

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj",
+      "projectUniqueName": "C:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj",
       "projectName": "PixelEditor",
-      "projectPath": "C:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\PixelEditor.csproj",
+      "projectPath": "C:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\PixelEditor.csproj",
       "packagesPath": "C:\\Users\\Ренат\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ренат\\Documents\\проги на c#\\PixelEditor\\obj\\",
+      "outputPath": "C:\\Users\\Ренат\\Documents\\проги на c#\\курсовая\\PixelEditor\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ренат\\AppData\\Roaming\\NuGet\\NuGet.Config"
