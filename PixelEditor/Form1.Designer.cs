@@ -1,4 +1,9 @@
-﻿namespace PixelEditor
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+using PixelEditor.Controls;
+
+namespace PixelEditor
 {
     partial class Form1
     {
@@ -31,12 +36,18 @@
             this.btnBgColor = new System.Windows.Forms.ToolStripButton();
             this.btnColor = new System.Windows.Forms.ToolStripButton();
             this.btnClear = new System.Windows.Forms.ToolStripButton();
+            this.btnApplyRotation = new System.Windows.Forms.ToolStripButton();
+            this.btnSave = new System.Windows.Forms.ToolStripButton();
+            this.btnLoad = new System.Windows.Forms.ToolStripButton();
             this.trackBarSize = new System.Windows.Forms.TrackBar();
             this.lblSize = new System.Windows.Forms.Label();
             this.panelSegmentType = new System.Windows.Forms.Panel();
             this.radioCurve = new System.Windows.Forms.RadioButton();
             this.radioStraight = new System.Windows.Forms.RadioButton();
-            this.textEntryBox = new System.Windows.Forms.TextBox();
+            this.textEntryBox = new TextInputBox();
+            this.panelRotation = new System.Windows.Forms.Panel();
+            this.lblRotation = new System.Windows.Forms.Label();
+            this.txtRotation = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSize)).BeginInit();
             this.panelSegmentType.SuspendLayout();
@@ -57,7 +68,10 @@
             this.btnTextColor,
             this.btnBgColor,
             this.btnColor,
-            this.btnClear});
+            this.btnClear,
+            this.btnApplyRotation,
+            this.btnSave,
+            this.btnLoad});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 25);
@@ -155,20 +169,43 @@
             this.btnClear.Size = new System.Drawing.Size(38, 22);
             this.btnClear.Text = "Clear";
             // 
+            // btnApplyRotation
+            // 
+            this.btnApplyRotation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnApplyRotation.Name = "btnApplyRotation";
+            this.btnApplyRotation.Size = new System.Drawing.Size(60, 22);
+            this.btnApplyRotation.Text = "Apply";
+            this.btnApplyRotation.Click += new System.EventHandler(this.BtnApplyRotation_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(35, 22);
+            this.btnSave.Text = "Save";
+            // 
+            // btnLoad
+            // 
+            this.btnLoad.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(35, 22);
+            this.btnLoad.Text = "Load";
+            // 
             // trackBarSize
             // 
-            this.trackBarSize.Location = new System.Drawing.Point(700, 0);
+            this.trackBarSize.Location = new System.Drawing.Point(700, 30);
             this.trackBarSize.Maximum = 50;
             this.trackBarSize.Minimum = 1;
             this.trackBarSize.Name = "trackBarSize";
-            this.trackBarSize.Size = new System.Drawing.Size(100, 45);
+            this.trackBarSize.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.trackBarSize.Size = new System.Drawing.Size(45, 100);
             this.trackBarSize.TabIndex = 1;
             this.trackBarSize.Value = 3;
             // 
             // lblSize
             // 
             this.lblSize.AutoSize = true;
-            this.lblSize.Location = new System.Drawing.Point(650, 5);
+            this.lblSize.Location = new System.Drawing.Point(700, 5);
             this.lblSize.Name = "lblSize";
             this.lblSize.Size = new System.Drawing.Size(44, 13);
             this.lblSize.TabIndex = 2;
@@ -218,11 +255,37 @@
             this.textEntryBox.TabIndex = 4;
             this.textEntryBox.Leave += new System.EventHandler(this.TextEntryBox_Leave);
             // 
+            // panelRotation
+            // 
+            this.panelRotation.Controls.Add(this.txtRotation);
+            this.panelRotation.Controls.Add(this.lblRotation);
+            this.panelRotation.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelRotation.Location = new System.Drawing.Point(700, 0);
+            this.panelRotation.Name = "panelRotation";
+            this.panelRotation.Size = new System.Drawing.Size(100, 25);
+            this.panelRotation.TabIndex = 5;
+            // 
+            // lblRotation
+            // 
+            this.lblRotation.AutoSize = true;
+            this.lblRotation.Location = new System.Drawing.Point(3, 5);
+            this.lblRotation.Name = "lblRotation";
+            this.lblRotation.Size = new System.Drawing.Size(50, 13);
+            this.lblRotation.Text = "Rotation:";
+            // 
+            // txtRotation
+            // 
+            this.txtRotation.Location = new System.Drawing.Point(53, 2);
+            this.txtRotation.Name = "txtRotation";
+            this.txtRotation.Size = new System.Drawing.Size(45, 20);
+            this.txtRotation.Text = "0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.ClientSize = new System.Drawing.Size(900, 600);
+            this.Controls.Add(this.panelRotation);
             this.Controls.Add(this.textEntryBox);
             this.Controls.Add(this.panelSegmentType);
             this.Controls.Add(this.lblSize);
@@ -260,11 +323,17 @@
         private System.Windows.Forms.ToolStripButton btnBgColor;
         private System.Windows.Forms.ToolStripButton btnColor;
         private System.Windows.Forms.ToolStripButton btnClear;
+        private System.Windows.Forms.ToolStripButton btnApplyRotation;
+        private System.Windows.Forms.ToolStripButton btnSave;
+        private System.Windows.Forms.ToolStripButton btnLoad;
         private System.Windows.Forms.TrackBar trackBarSize;
         private System.Windows.Forms.Label lblSize;
         private System.Windows.Forms.Panel panelSegmentType;
         private System.Windows.Forms.RadioButton radioCurve;
         private System.Windows.Forms.RadioButton radioStraight;
-        private System.Windows.Forms.TextBox textEntryBox;
+        private TextInputBox textEntryBox;
+        private System.Windows.Forms.Panel panelRotation;
+        private System.Windows.Forms.Label lblRotation;
+        private System.Windows.Forms.TextBox txtRotation;
     }
 }

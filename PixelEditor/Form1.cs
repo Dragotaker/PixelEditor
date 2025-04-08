@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Windows.Forms;
+using PixelEditor.Controls;
 
 namespace PixelEditor
 {
@@ -33,10 +34,17 @@ namespace PixelEditor
         private Color textBgColor = Color.White;
         private bool useBackground = true;
 
+        private float currentRotation = 0f;
+
+        private FileManager fileManager;
+
         public Form1()
         {
             InitializeComponent();
             InitializeCanvas();
+            
+            // Инициализация FileManager
+            fileManager = new FileManager();
             
             // Привязка обработчиков
             btnLine.Click += BtnLine_Click;
@@ -52,6 +60,9 @@ namespace PixelEditor
             btnFont.Click += BtnFont_Click;
             btnTextColor.Click += BtnTextColor_Click;
             btnBgColor.Click += BtnBgColor_Click;
+            btnApplyRotation.Click += BtnApplyRotation_Click;
+            btnSave.Click += BtnSave_Click;
+            btnLoad.Click += BtnLoad_Click;
 
             trackBarSize.Scroll += TrackBarSize_Scroll;
             radioStraight.CheckedChanged += RadioSegmentType_Changed;
@@ -61,6 +72,10 @@ namespace PixelEditor
             textEntryBox.Visible = false;
             textEntryBox.BorderStyle = BorderStyle.None;
             textEntryBox.Multiline = true;
+            textEntryBox.TextColor = textColor;
+            textEntryBox.BackgroundColor = textBgColor;
+            textEntryBox.UseBackground = useBackground;
+            textEntryBox.TextFont = textFont;
             textEntryBox.Leave += TextEntryBox_Leave;
         }
 
@@ -249,14 +264,20 @@ namespace PixelEditor
                     {
                         using (Pen pen = new Pen(drawColor, penSize))
                         {
-                            g.DrawEllipse(pen, e.X, e.Y, 1, 1);
+                            g.DrawEllipse(pen, e.X - penSize/2, e.Y - penSize/2, penSize, penSize);
+                            g.DrawLine(pen, previousPoint, e.Location);
                         }
                     }
                     else
                     {
-                        g.FillEllipse(Brushes.White, e.X - penSize/2, e.Y - penSize/2, penSize, penSize);
+                        using (Pen pen = new Pen(Color.White, penSize))
+                        {
+                            g.DrawEllipse(pen, e.X - penSize/2, e.Y - penSize/2, penSize, penSize);
+                            g.DrawLine(pen, previousPoint, e.Location);
+                        }
                     }
                 }
+                previousPoint = e.Location;
                 Invalidate();
             }
         }
@@ -274,6 +295,7 @@ namespace PixelEditor
                     {
                         using (Pen pen = new Pen(drawColor, penSize))
                         {
+                            g.DrawEllipse(pen, e.X - penSize/2, e.Y - penSize/2, penSize, penSize);
                             g.DrawLine(pen, previousPoint, e.Location);
                         }
                     }
@@ -281,6 +303,7 @@ namespace PixelEditor
                     {
                         using (Pen pen = new Pen(Color.White, penSize))
                         {
+                            g.DrawEllipse(pen, e.X - penSize/2, e.Y - penSize/2, penSize, penSize);
                             g.DrawLine(pen, previousPoint, e.Location);
                         }
                     }
@@ -333,9 +356,10 @@ namespace PixelEditor
             {
                 if (textEntryBox.Width > 10 && textEntryBox.Height > 10)
                 {
-                    textEntryBox.Font = textFont;
-                    textEntryBox.ForeColor = textColor;
-                    textEntryBox.BackColor = useBackground ? textBgColor : Color.Transparent;
+                    textEntryBox.TextColor = textColor;
+                    textEntryBox.BackgroundColor = textBgColor;
+                    textEntryBox.UseBackground = useBackground;
+                    textEntryBox.TextFont = textFont;
                     textEntryBox.Visible = true;
                     textEntryBox.Focus();
                 }
@@ -398,10 +422,33 @@ namespace PixelEditor
                     using (Brush textBrush = new SolidBrush(textColor))
                     {
                         StringFormat format = new StringFormat();
+                        format.Alignment = StringAlignment.Near;
+                        format.LineAlignment = StringAlignment.Near;
+
+                        // Сохраняем текущую матрицу преобразования
+                        Matrix originalMatrix = g.Transform;
+                        
+                        // Создаем новую матрицу для поворота
+                        Matrix rotationMatrix = new Matrix();
+                        
+                        // Вычисляем центр текстового блока
+                        PointF center = new PointF(
+                            textEntryBox.Left + textEntryBox.Width / 2f,
+                            textEntryBox.Top + textEntryBox.Height / 2f
+                        );
+                        
+                        // Применяем поворот относительно центра
+                        rotationMatrix.RotateAt(currentRotation, center);
+                        g.Transform = rotationMatrix;
+
+                        // Рисуем текст
                         g.DrawString(textEntryBox.Text, textFont, textBrush, 
                             textEntryBox.Left, 
                             textEntryBox.Top, 
                             format);
+
+                        // Восстанавливаем оригинальную матрицу
+                        g.Transform = originalMatrix;
                     }
                 }
                 textEntryBox.Visible = false;
@@ -502,6 +549,56 @@ namespace PixelEditor
         private void RadioSegmentType_Changed(object sender, EventArgs e)
         {
             isBezierSegment = radioCurve.Checked;
+        }
+
+        private void BtnApplyRotation_Click(object sender, EventArgs e)
+        {
+            if (float.TryParse(txtRotation.Text, out float angle))
+            {
+                currentRotation = angle;
+                if (textEntryBox.Visible)
+                {
+                    textEntryBox.RotationAngle = currentRotation;
+                    Invalidate();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid number for rotation angle.", "Invalid Input", 
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtRotation.Text = currentRotation.ToString();
+            }
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            SaveImage();
+        }
+
+        private void BtnLoad_Click(object sender, EventArgs e)
+        {
+            LoadImage();
+        }
+
+        private void SaveImage()
+        {
+            if (fileManager.SaveImage(canvas))
+            {
+                Invalidate();
+            }
+        }
+
+        private void LoadImage()
+        {
+            Bitmap loadedImage = fileManager.LoadImage();
+            if (loadedImage != null)
+            {
+                canvas = new Bitmap(loadedImage);
+                graphics = Graphics.FromImage(canvas);
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+                Invalidate();
+            }
         }
 
         protected override void OnResize(EventArgs e)
