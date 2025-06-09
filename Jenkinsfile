@@ -2,9 +2,8 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REGISTRY = 'your-registry-url'
+        DOCKER_REGISTRY = 'localhost:5000'
         DOCKER_IMAGE = 'pixel-editor'
-        KUBE_CONFIG = credentials('kubeconfig')
     }
     
     stages {
@@ -12,8 +11,8 @@ pipeline {
             steps {
                 script {
                     // Проверка наличия kubeconfig
-                    if (!fileExists('kubeconfig')) {
-                        error 'kubeconfig credentials not found in Jenkins'
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        echo "Kubeconfig credentials found"
                     }
                     
                     // Проверка наличия docker registry credentials
@@ -49,7 +48,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
                                                     usernameVariable: 'DOCKER_USER', 
                                                     passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "docker login ${DOCKER_REGISTRY} -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}"
+                        bat "docker login ${DOCKER_REGISTRY} -u %DOCKER_USER% -p %DOCKER_PASSWORD%"
                     }
                     
                     // Push the image
@@ -65,16 +64,18 @@ pipeline {
             steps {
                 script {
                     // Write kubeconfig to file
-                    writeFile file: 'kubeconfig', text: "${KUBE_CONFIG}"
-                    
-                    // Deploy to Kubernetes
-                    sh """
-                        export KUBECONFIG=kubeconfig
-                        kubectl config use-context minikube
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl set image deployment/pixel-editor pixel-editor=${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
-                        kubectl rollout status deployment/pixel-editor
-                    """
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        writeFile file: 'kubeconfig', text: "${KUBECONFIG}"
+                        
+                        // Deploy to Kubernetes
+                        bat """
+                            set KUBECONFIG=kubeconfig
+                            kubectl config use-context minikube
+                            kubectl apply -f k8s/deployment.yaml
+                            kubectl set image deployment/pixel-editor pixel-editor=${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
+                            kubectl rollout status deployment/pixel-editor
+                        """
+                    }
                 }
             }
         }
@@ -82,9 +83,11 @@ pipeline {
     
     post {
         always {
-            // Cleanup
-            sh 'docker rmi ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER} || true'
-            sh 'rm -f kubeconfig'
+            script {
+                // Cleanup
+                bat 'docker rmi %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%BUILD_NUMBER% || exit 0'
+                bat 'del kubeconfig || exit 0'
+            }
         }
         success {
             echo 'Pipeline completed successfully!'
