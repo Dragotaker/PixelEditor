@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PixelEditor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b118ac2358eaad3c6c31d0a5be207789203f5ab0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ae9ddc36bba53879694906f8ca418b20ed894ba")]
 [assembly: System.Reflection.AssemblyProductAttribute("PixelEditor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PixelEditor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
