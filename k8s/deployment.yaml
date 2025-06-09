@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixel-editor
+  labels:
+    app: pixel-editor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pixel-editor
+  template:
+    metadata:
+      labels:
+        app: pixel-editor
+    spec:
+      containers:
+      - name: pixel-editor
+        image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pixel-editor-service
+spec:
+  selector:
+    app: pixel-editor
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP 
