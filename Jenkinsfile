@@ -7,15 +7,30 @@ pipeline {
     }
     
     stages {
+        stage('Check Environment') {
+            steps {
+                script {
+                    // Проверка Docker
+                    sh 'docker --version || echo "Docker not installed or not accessible"'
+                    
+                    // Проверка Minikube
+                    sh 'minikube status || echo "Minikube not running or minikube command not found"'
+                    
+                    // Проверка kubectl
+                    sh 'kubectl version --client || echo "kubectl not installed or not found"'
+                }
+            }
+        }
+        
         stage('Validate Credentials') {
             steps {
                 script {
-                    // Проверка наличия kubeconfig
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                        echo "Kubeconfig credentials found"
+                    // Kubeconfig credentials are made available as a temporary file
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE_PATH')]) {
+                        sh "echo Kubeconfig credentials found at ${KUBECONFIG_FILE_PATH}"
                     }
                     
-                    // Проверка наличия docker registry credentials
+                    // Docker registry credentials
                     withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
                                                     usernameVariable: 'DOCKER_USER', 
                                                     passwordVariable: 'DOCKER_PASSWORD')]) {
@@ -28,8 +43,12 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    if (!fileExists('Dockerfile')) {
+                        error 'Dockerfile not found!'
+                    }
+                    
                     // Build the Docker image
-                    docker.build("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                    sh "docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -48,14 +67,13 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
                                                     usernameVariable: 'DOCKER_USER', 
                                                     passwordVariable: 'DOCKER_PASSWORD')]) {
-                        bat "docker login ${DOCKER_REGISTRY} -u %DOCKER_USER% -p %DOCKER_PASSWORD%"
+                        sh "docker login ${DOCKER_REGISTRY} -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}"
                     }
                     
                     // Push the image
-                    docker.withRegistry("${DOCKER_REGISTRY}") {
-                        docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
-                        docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}").push('latest')
-                    }
+                    sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    sh "docker tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest"
+                    sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest"
                 }
             }
         }
@@ -63,13 +81,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Write kubeconfig to file
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                        writeFile file: 'kubeconfig', text: "${KUBECONFIG}"
-                        
-                        // Deploy to Kubernetes
-                        bat """
-                            set KUBECONFIG=kubeconfig
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE_PATH')]) {
+                        sh """
+                            export KUBECONFIG=${KUBECONFIG_FILE_PATH}
                             kubectl config use-context minikube
                             kubectl apply -f k8s/deployment.yaml
                             kubectl set image deployment/pixel-editor pixel-editor=${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
@@ -84,9 +98,10 @@ pipeline {
     post {
         always {
             script {
-                // Cleanup
-                bat 'docker rmi %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%BUILD_NUMBER% || exit 0'
-                bat 'del kubeconfig || exit 0'
+                node { // Ensure cleanup runs within a node context
+                    // Cleanup
+                    sh "docker rmi ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
+                }
             }
         }
         success {
